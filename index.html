@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=SUSE&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Element Atomic Number Quiz</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Custom styles */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            background-color: #f8f9fa;
+        }
+
+        /* Navbar adjustments */
+        .custom-navbar {
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+
+        /* Reduce height of the search button */
+        .navbar .btn-outline-success {
+            padding: 0.1rem 0.75rem;
+            font-size: 14px;
+        }
+
+        .video-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        .content-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-grow: 1;
+            flex-direction: column;
+            color: #fff;
+        }
+        .suse{
+  font-family: "SUSE", system-ui;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+        .content {
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            max-width: 500px;
+            margin: auto;
+        }
+
+        .btn, .input-group {
+            margin: 10px 0;
+        }
+
+        #nextQuestionButton {
+            display: inline;
+        }
+
+        #submitButton {
+            display: none;
+        }
+
+        #score-container {
+            display: none;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        /* Responsive styles for phones */
+        @media (max-width: 576px) {
+            .input-group {
+                font-size: 14px;
+            }
+            .input-group-text {
+                padding: 0.375rem 0.75rem;
+            }
+
+            .form-control {
+                padding: 0.375rem 0.75rem;
+            }
+
+            #question {
+                font-size: 16px;
+            }
+
+            .btn {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body class="suse">
+    <!-- Video Background -->
+    <video class="video-background" autoplay muted loop>
+        <source src="vid.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary custom-navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">ElementQuiz</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Periodic Table</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            Sort
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#">Atomic Weight</a></li>
+                            <li><a class="dropdown-item" href="#">Name</a></li>
+                            <li><a class="dropdown-item" href="#">Symbol</a></li>
+                            <li><a class="dropdown-item" href="#">Boiling Point</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" aria-disabled="true">Contact Us</a>
+                    </li>
+                </ul>
+                <form class="d-flex" role="search">
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success" type="submit">Search</button>
+                </form>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content-container">
+        <div id="quiz-container" class="content">
+            <h1>Element Atomic Number Quiz</h1>
+            <div id="question-container" class="mb-3">
+                <div class="input-group flex-nowrap">
+                  <span class="input-group-text" id="addon-wrapping">?</span>
+                  <input type="text" id="question" class="form-control" placeholder="Question will appear here" aria-label="Question" aria-describedby="addon-wrapping" readonly>
+                </div>
+            </div>
+
+            <div id="options-container" class="mb-3">
+                <!-- Options will be dynamically inserted here -->
+            </div>
+
+            <button id="nextQuestionButton" class="btn btn-primary">Next Question</button>
+            <button id="submitButton" class="btn btn-success">Submit</button>
+        </div>
+
+        <!-- Score Display Container -->
+        <div id="score-container" class="content">
+            <h2>Your Score: <span id="final-score"></span>/10</h2>
+            <button id="restartQuizButton" class="btn btn-secondary">Restart Quiz</button>
+        </div>
+    </div>
+
+    <script>
+        const elementToAtomicNumber = {
+  "Hydrogen": 1, "Helium": 2, "Lithium": 3, "Beryllium": 4, "Boron": 5, "Carbon": 6, "Nitrogen": 7, "Oxygen": 8, "Fluorine": 9, "Neon": 10,
+  "Sodium": 11, "Magnesium": 12, "Aluminium": 13, "Silicon": 14, "Phosphorus": 15, "Sulfur": 16, "Chlorine": 17, "Argon": 18, "Potassium": 19, "Calcium": 20,
+  "Scandium": 21, "Titanium": 22, "Vanadium": 23, "Chromium": 24, "Manganese": 25, "Iron": 26, "Cobalt": 27, "Nickel": 28, "Copper": 29, "Zinc": 30,
+  "Gallium": 31, "Germanium": 32, "Arsenic": 33, "Selenium": 34, "Bromine": 35, "Krypton": 36, "Rubidium": 37, "Strontium": 38, "Yttrium": 39, "Zirconium": 40,
+  "Niobium": 41, "Molybdenum": 42, "Technetium": 43, "Ruthenium": 44, "Rhodium": 45, "Palladium": 46, "Silver": 47, "Cadmium": 48, "Indium": 49, "Tin": 50,
+  "Antimony": 51, "Tellurium": 52, "Iodine": 53, "Xenon": 54, "Cesium": 55, "Barium": 56, "Lanthanum": 57, "Cerium": 58, "Praseodymium": 59, "Neodymium": 60,
+  "Promethium": 61, "Samarium": 62, "Europium": 63, "Gadolinium": 64, "Terbium": 65, "Dysprosium": 66, "Holmium": 67, "Erbium": 68, "Thulium": 69, "Ytterbium": 70,
+  "Lutetium": 71, "Hafnium": 72, "Tantalum": 73, "Tungsten": 74, "Rhenium": 75, "Osmium": 76, "Iridium": 77, "Platinum": 78, "Gold": 79, "Mercury": 80,
+  "Thallium": 81, "Lead": 82, "Bismuth": 83, "Polonium": 84, "Astatine": 85, "Radon": 86, "Francium": 87, "Radium": 88, "Actinium": 89, "Thorium": 90,
+  "Protactinium": 91, "Uranium": 92, "Neptunium": 93, "Plutonium": 94, "Americium": 95, "Curium": 96, "Berkelium": 97, "Californium": 98, "Einsteinium": 99,
+  "Fermium": 100, "Mendelevium": 101, "Nobelium": 102, "Lawrencium": 103, "Rutherfordium": 104, "Dubnium": 105, "Seaborgium": 106, "Bohrium": 107,
+  "Hassium": 108, "Meitnerium": 109, "Darmstadtium": 110, "Roentgenium": 111, "Copernicium": 112, "Nihonium": 113, "Flerovium": 114, "Moscovium": 115,
+  "Livermorium": 116, "Tennessine": 117, "Oganesson": 118
+};
+
+        const atomicNumberToElement = Object.fromEntries(Object.entries(elementToAtomicNumber).map(([k, v]) => [v, k]));
+
+        let usedElements = new Set();
+        let currentElement = null;
+        let correctAnswer = null;
+        let score = 0;
+        let questionCount = 0;
+        const maxQuestions = 10;
+        const correctAnswers = [];
+
+        function getRandomElement() {
+            const remainingElements = Object.keys(elementToAtomicNumber).filter(e => !usedElements.has(e));
+            const randomIndex = Math.floor(Math.random() * remainingElements.length);
+            return remainingElements[randomIndex];
+        }
+
+        function generateOptions(correctAnswer) {
+            const allAtomicNumbers = Object.values(elementToAtomicNumber);
+            const shuffledNumbers = allAtomicNumbers.sort(() => 0.5 - Math.random());
+            const options = shuffledNumbers.slice(0, 3);
+            if (!options.includes(correctAnswer)) {
+                options[Math.floor(Math.random() * 3)] = correctAnswer;
+            }
+            return options;
+        }
+
+        function displayQuestion() {
+            if (questionCount === maxQuestions) {
+                endQuiz();
+                return;
+            }
+
+            currentElement = getRandomElement();
+            correctAnswer = elementToAtomicNumber[currentElement];
+            const questionElement = document.getElementById('question');
+            const optionsContainer = document.getElementById('options-container');
+
+            questionElement.value = `What is the atomic number of ${currentElement}?`;
+
+            const options = generateOptions(correctAnswer);
+            optionsContainer.innerHTML = '';
+
+            options.forEach(option => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'input-group mb-3';
+
+                const radioDiv = document.createElement('div');
+                radioDiv.className = 'input-group-text';
+
+                const radioInput = document.createElement('input');
+                radioInput.type = 'radio';
+                radioInput.name = 'options';
+                radioInput.value = option;
+                radioInput.className = 'form-check-input mt-0';
+
+                radioDiv.appendChild(radioInput);
+
+                const radioLabel = document.createElement('input');
+                radioLabel.type = 'text';
+                radioLabel.className = 'form-control';
+                radioLabel.value = option;
+                radioLabel.disabled = true;
+
+                optionDiv.appendChild(radioDiv);
+                optionDiv.appendChild(radioLabel);
+                optionsContainer.appendChild(optionDiv);
+            });
+        }
+
+        function checkAnswer() {
+            const selectedOption = document.querySelector('input[name="options"]:checked');
+            if (selectedOption) {
+                const userAnswer = parseInt(selectedOption.value, 10);
+                const isCorrect = userAnswer === correctAnswer;
+
+                correctAnswers.push({
+                    element: currentElement,
+                    answer: userAnswer,
+                    correctAnswer: correctAnswer
+                });
+
+                if (isCorrect) {
+                    score++;
+                }
+
+                usedElements.add(currentElement);
+                questionCount++;
+
+                if (questionCount < maxQuestions) {
+                    displayQuestion();
+                } else {
+                    document.getElementById('nextQuestionButton').style.display = 'none';
+                    document.getElementById('submitButton').style.display = 'inline';
+                }
+            }
+        }
+
+        function endQuiz() {
+            const quizContainer = document.getElementById('quiz-container');
+            const scoreContainer = document.getElementById('score-container');
+            const finalScoreElement = document.getElementById('final-score');
+
+            quizContainer.style.display = 'none';
+            scoreContainer.style.display = 'block';
+            finalScoreElement.textContent = score;
+
+            correctAnswers.forEach(answer => {
+                const resultDiv = document.createElement('div');
+                resultDiv.textContent = `${answer.element}: Your answer ${answer.answer}, Correct: ${answer.correctAnswer}`;
+                scoreContainer.appendChild(resultDiv);
+            });
+        }
+
+        document.getElementById('nextQuestionButton').addEventListener('click', checkAnswer);
+        document.getElementById('submitButton').addEventListener('click', endQuiz);
+
+        displayQuestion();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
